@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.3] - 2026-04-06
+
+### Changed
+
+- README: clarify that the bridge relays raw LoRa packets and works with any
+  protocol (Meshtastic, MeshCore, etc.) simultaneously.
+
 ## [0.2.2] - 2026-04-06
 
 ### Fixed

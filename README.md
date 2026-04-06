@@ -4,16 +4,19 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 ![Rust](https://img.shields.io/badge/rust-1.94.1%2B-orange)
 
-**donglora-bridge** connects LoRa radios to the internet so packets heard by one
-radio can be retransmitted by another radio anywhere in the world.
+**donglora-bridge** relays raw LoRa packets over the internet. Every packet your
+radio hears is forwarded to every other bridge running the same passphrase, and
+their radios retransmit it locally. Because it operates on raw packets, it works
+with any protocol built on LoRa --
+[Meshtastic](https://meshtastic.org/),
+[MeshCore](https://github.com/rocketgithub/meshcore-firmware),
+or anything else -- simultaneously and without configuration. If your radio can
+hear it, the bridge will relay it.
 
 [LoRa](https://en.wikipedia.org/wiki/LoRa) is a long-range, low-power wireless
-protocol used by off-grid mesh networks like
-[MeshCore](https://github.com/rocketgithub/meshcore-firmware). A single LoRa
-radio might cover a few kilometers. This bridge removes that limit: any packet
-your radio hears gets relayed over the internet to every other bridge running the
-same passphrase, and their radios retransmit it locally. The result is a single
-mesh network across a larger geographic area.
+modulation used by off-grid mesh networks. A single radio might cover a few
+kilometers. This bridge removes that limit, extending a local LoRa network
+across a larger geographic area.
 
 There is no central server. Bridges discover each other automatically using the
 [Mainline DHT](https://en.wikipedia.org/wiki/Mainline_DHT) and communicate
