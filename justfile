@@ -1,59 +1,68 @@
-# Default: run all checks
+set shell := ["bash", "-c"]
+
 default: build
 
-# Run all checks (fmt, clippy, test)
+[private]
+_ensure_tools:
+    @mise trust --yes . 2>/dev/null; mise install --quiet
+
+# Run the bridge (TUI mode)
+run *args: _ensure_tools
+    cargo run --release -- {{args}}
+
+# Run in headless mode
+run-headless *args: _ensure_tools
+    cargo run --release -- --log-only {{args}}
+
+# Run the config wizard
+config: _ensure_tools
+    cargo run --release -- config
+
+# Run all checks (fmt, clippy, test, audit)
 check: fmt-check clippy test audit
 
 # Format code
-fmt:
+fmt: _ensure_tools
     cargo fmt
 
 # Check formatting without changing files
-fmt-check:
+fmt-check: _ensure_tools
     cargo fmt --check
 
-# Lint with clippy (pedantic + nursery)
-clippy:
+# Lint with clippy
+clippy: _ensure_tools
     cargo clippy --all-targets -- -D warnings
 
-# Build release binary
-build:
-    cargo build --release
-
-# Generate docs
-doc:
-    cargo doc --no-deps --open
-
-# Run the bridge (TUI mode)
-run *ARGS:
-    cargo run --release -- {{ARGS}}
-
-# Run in headless mode
-run-headless *ARGS:
-    cargo run --release -- --log-only {{ARGS}}
-
-# Run the config wizard
-config:
-    cargo run --release -- config
-
-# Security + license audit
-audit:
-    cargo deny check
-
 # Run all tests
-test: test-unit test-fuzz test-mutants
+test: test-unit
 
 # Normal unit tests
-test-unit:
+test-unit: _ensure_tools
     cargo nextest run
 
 # Mutation testing
-test-mutants *ARGS:
-    cargo mutants {{ARGS}}
+test-mutants *args: _ensure_tools
+    cargo mutants {{args}}
 
 # Fuzz a target (requires nightly)
-test-fuzz TARGET="fuzz_gossip_frame_decode" DURATION="60":
+test-fuzz TARGET="fuzz_gossip_frame_decode" DURATION="60": _ensure_tools
     cargo +nightly fuzz run {{TARGET}} -- -max_total_time={{DURATION}}
+
+# Security + license audit
+audit: _ensure_tools
+    cargo deny check
+
+# Build release binary
+build: _ensure_tools
+    cargo build --release
+
+# Generate docs
+doc: _ensure_tools
+    cargo doc --no-deps --open
+
+# Check for outdated dependencies
+outdated: _ensure_tools
+    cargo outdated
 
 # Clean build artifacts
 clean:
